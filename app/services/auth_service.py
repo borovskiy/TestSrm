@@ -10,7 +10,7 @@ from app.schemas.auth_schemas import TokenFullRes, UserRegisterSchemaReq, UserSc
 from app.schemas.user_schemas import UserPayloadToken
 from app.services.base_services import BaseServices
 from app.utils.auth_utils import AuthUtils
-from app.utils.raises import _conflict, _not_found, _forbidden, _ok, _unauthorized
+from app.utils.raises import _conflict, _not_found, _forbidden, _ok, _unauthorized, _create
 
 # pwd_context = CryptContext(
 #     schemes=["bcrypt"],
@@ -29,21 +29,21 @@ class AuthService(BaseServices):
         self.repo_org = OrganizationRepository(session)
         self.repo_mem_org = OrganizationMemberRepository(session)
 
-    async def create_user(self, register_schema: UserRegisterSchemaReq) -> str:
+    async def register_user(self, register_schema: UserRegisterSchemaReq) -> str:
         self.log.info("create_user")
         find_user = await self.repo_user.find_user_email(register_schema.email)
+        organization = await self.repo_org.checking_existence_organization_by_name(register_schema.organization_name)
+        if organization is None:
+            raise _not_found(f"Organization {register_schema.organization_name} not found")
         if find_user is None:
-            organization = await self.repo_org.checking_existence_organization(register_schema.organization_name)
-            if organization is not None:
-                register_schema.hashed_password = await AuthUtils.hash_password(register_schema.hashed_password)
-                user_dict = register_schema.model_dump()
-                user = await self.repo_user.create_one_obj_model(user_dict)
-                await self.repo_mem_org.add_members_in_organisation(organization_id=organization.id, user_id=user.id)
-                await self.repo_user.session.commit()
-                return f"User {user.email} created and added in organisation {organization.name}"
-            else:
-                raise _not_found(f"Organization {register_schema.organization_name} not found")
-        raise _forbidden(f"User with email: {register_schema.email} exists")
+            register_schema.hashed_password = await AuthUtils.hash_password(register_schema.hashed_password)
+            find_user = await self.repo_user.create_one_obj_model(register_schema.model_dump())
+        if await self.repo_mem_org.get_members_in_organisation(organization_id=organization.id,
+                                                         user_id=find_user.id) is not None:
+            raise _forbidden(f"User with email: {register_schema.email} exists in organisation {organization.name}")
+        await self.repo_mem_org.add_members_in_organisation(organization_id=organization.id, user_id=find_user.id)
+        await self.repo_user.session.commit()
+        return _create(f"User {find_user.email} created and added in organisation {organization.name}")
 
     async def login_user(self, user_email: str, user_password_hash: str) -> TokenFullRes | None:
         self.log.info("Try login user %s ", user_email)

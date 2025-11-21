@@ -3,7 +3,7 @@ from abc import ABC
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm.sync import update
+from sqlalchemy import update
 
 from app.utils.raises import _bad_request
 

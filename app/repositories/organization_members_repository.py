@@ -11,7 +11,7 @@ class OrganizationMemberRepository(BaseRepo):
         super().__init__(session)
         self.main_model = OrganizationMemberModel
 
-    async def add_members_in_organisation(self, organization_id: str, user_id: str):
+    async def add_members_in_organisation(self, organization_id: int, user_id: int):
         # закрепляем юзера за организацией
         self.log.info(f"add_members_in_organisation")
         obj = OrganizationMemberModel(organization_id=organization_id, user_id=user_id, role=RoleEnum.MEMBER)

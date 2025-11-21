@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import HTTPException
 from pydantic import EmailStr
-from sqlalchemy import select, delete, update, func, insert
+from sqlalchemy import select, delete, update, func, insert, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -19,6 +19,21 @@ class UserRepository(BaseRepo):
     async def find_user_email(self, mail: EmailStr) -> UserModel | None:
         self.log.info("find_user_email %s ", mail)
         stmt = select(self.main_model).where(self.main_model.email == mail)
+        return await self.execute_session_get_one(stmt)
+
+    async def find_user_email_with_org(self, mail: EmailStr, org_name: str) -> UserModel | None:
+        self.log.info("find_user_email %s ", mail)
+        stmt = (
+            select(self.main_model)
+            .options(joinedload(self.main_model.organization_memberships))
+            .options(joinedload(self.main_model.organization_memberships.organization))
+            .where(
+                and_(
+                    self.main_model.email == mail,
+                    self.main_model.organization_memberships.organization.name == org_name
+                )
+            )
+        )
         return await self.execute_session_get_one(stmt)
 
     async def find_user_id(self, id_user: int, need_token: bool = False) -> UserModel | Exception:

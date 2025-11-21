@@ -34,7 +34,7 @@ async def register(
     Регистрация пользователя
     """
     logger.info("Try get user service")
-    return await auth_serv.create_user(register_user)
+    return await auth_serv.register_user(register_user)
 
 @router.post("/login", response_model=TokenFullRes)
 async def login(
@@ -42,7 +42,7 @@ async def login(
         auth_serv: Annotated[AuthService, Depends(auth_services)],
 ):
     """
-    KЛогинимся и получаем токены
+    Логинимся и получаем токены
     """
     logger.info("Try get user service")
     return await auth_serv.login_user(data_user.email, data_user.password)
@@ -54,7 +54,7 @@ async def refresh_token(
         auth_serv: Annotated[AuthService, Depends(auth_services)],
 ):
     """
-    In case you become aware of a token leak, this will help you change it
+    Получаешь новый токен по рефрэшу
     """
     logger.info("Try get user service")
     return auth_serv.refresh_token(refresh_token_user)

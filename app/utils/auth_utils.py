@@ -60,13 +60,10 @@ class AuthUtils:
 
     @staticmethod
     def create_access_token(data: "UserSchemaPayload"):
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.VERIFY_TOKEN_TTL_MIN)
+        expire = datetime.now(timezone.utc) + timedelta(days=settings.VERIFY_TOKEN_TTL_MIN)
         data.exp = int(expire.timestamp())
-        payload = data.model_dump() if hasattr(data, "model_dump") else dict(data)
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.VERIFY_TOKEN_TTL_MIN)
-        payload["exp"] = int(expire.timestamp())
         return jwt.encode(
-            payload,
+            data.model_dump(),
             settings.JWT_SECRET,
             algorithm=settings.JWT_ALG
         )

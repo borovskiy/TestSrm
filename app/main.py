@@ -3,8 +3,7 @@ from fastapi import FastAPI
 from sqlalchemy.orm import configure_mappers
 from dotenv import load_dotenv
 
-from api.v1 import auth_route
-from app.api.v1 import organization_route
+from app.api.v1 import organization_route, auth_route, contact_route
 from app.logging_conf import setup_logging
 from app.middleware import CorrelationIdASGIMiddleware
 
@@ -23,7 +22,7 @@ def create_app() -> FastAPI:
     )
     app.include_router(auth_route.router, prefix="/api")
     app.include_router(organization_route.router, prefix="/api")
-    # app.include_router(exercises.router, prefix="/api/v1/exercises", tags=["exercises"])
+    app.include_router(contact_route.router, prefix="/api")
     # app.include_router(workout.router, prefix="/api/v1/workouts", tags=["workouts"])
     # app.include_router(group.router, prefix="/api/v1/groups", tags=["groups"])
 
