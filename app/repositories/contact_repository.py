@@ -1,9 +1,11 @@
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.context_user import get_current_user
 from app.models import ContactModel
 from app.repositories.base_repository import BaseRepo
 from app.schemas.paginate_schema import PaginationGet
+from app.utils.raises import _not_found, _forbidden
 
 
 class ContactRepository(BaseRepo):
@@ -65,16 +67,25 @@ class ContactRepository(BaseRepo):
         await self.session.flush()
         return obj
 
-    async def get_contact_by_org(self, id_organisation: int, id_contact) -> ContactModel:
-        self.log.info(f"add_contacts")
+    async def get_contact_by_org(self, id_org: int, id_con) -> ContactModel:
+        self.log.info(f"get_contact_by_org")
         stmt = (
             select(self.main_model)
             .where(
                 and_(
-                    self.main_model.organization_id == id_organisation,
-                    self.main_model.id == id_contact
+                    self.main_model.organization_id == id_org,
+                    self.main_model.id == id_con
                 )
 
             ))
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def get_check_contact_for_request(self, id_org: int, id_con, list_valid_roles: list) -> ContactModel:
+        contact = await self.get_contact_by_org(id_org, id_con)
+        if contact is None:
+            raise _not_found("Not found contact in organisation")
+        if contact.owner_id != get_current_user().id:
+            if get_current_user().role_in_organization not in list_valid_roles:
+                raise _forbidden("You do not have the right to change contact data for the current user")
+        return contact

@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 
 from app.authentication import require_roles
@@ -34,15 +36,4 @@ router = APIRouter(
 #     ...
 #
 #
-# @router.post("/",
-#              response_model=ContactsSchema,
-#              status_code=201,
-#              dependencies=[Depends(require_roles(
-#                  [RoleEnum.MEMBER.value, RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value]))]
-#              )
-async def add_contact(
-        contact_serv: Annotated[ContactService, Depends(contact_services)],
-        contact_data: ContactsAddSchema,
-        user_id: int | None = None,
-):
-    ...
+

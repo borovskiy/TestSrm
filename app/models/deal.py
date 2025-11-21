@@ -1,7 +1,10 @@
-from sqlalchemy import String, DateTime, ForeignKey, Numeric, Text
+from sqlalchemy import String, DateTime, ForeignKey, Numeric, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from typing import TYPE_CHECKING
+from enum import Enum as PyEnum
+
+from .organization_member import RoleEnum
 
 if TYPE_CHECKING:
     from .organization import OrganizationModel
@@ -11,6 +14,43 @@ if TYPE_CHECKING:
     from .activity import ActivityModel
 
 from .base import BaseModel
+
+
+class DealStatus(PyEnum):
+    NEW = "new"
+    IN_PROGRESS = "in_progress"
+    WON = "won"
+    LOST = "lost"
+
+    @classmethod
+    def list_values(cls):
+        """Возвращает список значений в порядке объявления"""
+        return [member.value for member in cls]
+
+    @classmethod
+    def rollback_validation(cls, name_status: str, role_request_usr: str, current_status: str) -> bool:
+        values = DealStatus.list_values()
+
+        if role_request_usr != RoleEnum.MEMBER.value:
+            return True
+        try:
+            current_index = values.index(current_status)
+            target_index = values.index(name_status)
+        except ValueError:
+            return False
+        return target_index >= current_index
+
+
+class DealStage(PyEnum):
+    QUALIFICATION = "qualification"
+    PROPOSAL = "proposal"
+    NEGOTIATION = "negotiation"
+    CLOSED = "closed"
+
+    @classmethod
+    def list_values(cls):
+        """Возвращает список значений в порядке объявления"""
+        return [member.value for member in cls]
 
 
 class DealModel(BaseModel):
@@ -23,9 +63,9 @@ class DealModel(BaseModel):
     title: Mapped[str] = mapped_column(String(255))
     amount: Mapped[float] = mapped_column(Numeric(15, 2), nullable=True)
     currency: Mapped[str] = mapped_column(String(10), default="USD")
-    status: Mapped[str] = mapped_column(String(50), default="new")  # new, in_progress, won, lost
-    stage: Mapped[str] = mapped_column(String(100),
-                                       default="qualification")  # qualification, proposal, negotiation, closed
+    status: Mapped[DealStatus] = mapped_column(Enum(DealStatus), default=DealStatus.NEW, nullable=False, )
+
+    stage: Mapped[DealStage] = mapped_column(Enum(DealStage), default=DealStage.QUALIFICATION, nullable=False, )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

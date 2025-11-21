@@ -20,12 +20,6 @@ class ContactService(BaseServices):
         self.cont_org_rep = ContactRepository(session)
         self.org_mem_rep = OrganizationMemberRepository(session)
 
-        self.valid_roles = [
-            RoleEnum.OWNER.value,
-            RoleEnum.MANAGER.value,
-            RoleEnum.ADMIN.value,
-        ]
-
     async def get_contacts(self, pag: PaginationGet):
         current_user = get_current_user()
         contacts, total = await self.cont_org_rep.get_contacts_organisation(current_user.organization_id, pag)
@@ -55,11 +49,10 @@ class ContactService(BaseServices):
     async def update_contacts(self, id_contact: int, data: ContactsAddSchema) -> ContactModel:
         current_user: UserSchemaPayload = get_current_user()
         current_org_id: int = current_user.organization_id
-        contact_data: ContactModel = await self.cont_org_rep.get_contact_by_org(current_org_id, id_contact)
-        if contact_data is None:
-            raise _not_found("Not found contact in organisation")
-        if contact_data.owner_id != current_user.id:
-            if current_user.role_in_organization not in self.valid_roles:
-                raise _forbidden("You do not have the right to change contact data for the current user")
-        result = await self.cont_org_rep.update_model_id(id_contact, data.model_dump())
-        return result
+        await self.cont_org_rep.get_check_contact_for_request(
+            current_org_id,
+            id_contact,
+            self.valid_roles
+        )
+
+        return await self.cont_org_rep.update_model_id(id_contact, data.model_dump())

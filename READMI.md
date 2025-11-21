@@ -3,6 +3,7 @@ http://localhost:8089/
 http://localhost:5050/docs
 
 export DATABASE_URL="postgresql+asyncpg://alchemy_user:strong_password_123@localhost:5432/alchemy_crm"
+alembic revision --autogenerate
 alembic upgrade head
 
 
