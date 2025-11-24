@@ -37,10 +37,9 @@ class UserRepository(BaseRepo):
         return await self.execute_session_get_one(stmt)
 
     async def find_user_id(self, id_user: int, need_token: bool = False) -> UserModel | Exception:
+        # ищем юзера по ид . Если нет бросаем ошибку отсюда
         self.log.info("find_user_id %s ", id_user)
         stmt = select(self.main_model).where(self.main_model.id == id_user)
-        if need_token:
-            stmt = stmt.options(joinedload(self.main_model.token))
         result_user = await self.execute_session_get_one(stmt)
         if result_user is None:
             raise _not_found('User not found')

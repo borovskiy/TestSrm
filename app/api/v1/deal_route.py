@@ -60,7 +60,7 @@ async def add_deal(
              dependencies=[Depends(require_roles(
                  [RoleEnum.MEMBER.value, RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value]))]
              )
-async def add_deal(
+async def update_deal(
         deal_serv: Annotated[DealService, Depends(deal_services)],
         deal_data: DealPatchSchema,
         deal_id: int

@@ -29,7 +29,7 @@ async def get_contacts(
         contact_serv: Annotated[ContactService, Depends(contact_services)],
         pagination: PaginationGet = Depends(PaginationGet),
 ):
-    return await contact_serv.get_contacts(pagination)
+    return await contact_serv.get_contact(pagination)
 
 
 @router.put("/{id_contact}",
@@ -43,7 +43,7 @@ async def update_contact(
         contact_serv: Annotated[ContactService, Depends(contact_services)],
         contact_data: ContactsAddSchema,
 ):
-    return await contact_serv.update_contacts(id_contact, contact_data)
+    return await contact_serv.update_contact(id_contact, contact_data)
 
 
 @router.post("/",
@@ -57,4 +57,18 @@ async def add_contact(
         contact_data: ContactsAddSchema,
         user_id: int | None = None,
 ):
-    return await contact_serv.add_contacts(user_id, contact_data)
+    return await contact_serv.add_contact(user_id, contact_data)
+
+
+@router.delete("/{contact_id}",
+             response_model=ContactsSchema,
+             status_code=200,
+             dependencies=[Depends(require_roles(
+                 [RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value]))]
+             )
+async def delete_contact(
+        contact_serv: Annotated[ContactService, Depends(contact_services)],
+        contact_data: ContactsAddSchema,
+        user_id: int | None = None,
+):
+    return await contact_serv.delete_contact(user_id, contact_data)

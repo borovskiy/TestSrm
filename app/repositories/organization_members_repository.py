@@ -11,19 +11,19 @@ class OrganizationMemberRepository(BaseRepo):
         super().__init__(session)
         self.main_model = OrganizationMemberModel
 
-    async def add_members_in_organisation(self, organization_id: int, user_id: int):
+    async def add_members_in_organisation(self, org_id: int, user_id: int, role:RoleEnum):
         # закрепляем юзера за организацией
         self.log.info(f"add_members_in_organisation")
-        obj = OrganizationMemberModel(organization_id=organization_id, user_id=user_id, role=RoleEnum.MEMBER)
+        obj = OrganizationMemberModel(organization_id=org_id, user_id=user_id, role=role)
         self.session.add(obj)
         await self.session.flush()
         return obj
 
-    async def get_members_in_organisation(self, organization_id: int, user_id: int) -> OrganizationMemberModel | None:
+    async def get_member_in_organisation(self, org_id: int, user_id: int) -> OrganizationMemberModel | None:
         # получаем юзера с организацией
         self.log.info(f"add_members_in_organisation")
         stmt = select(self.main_model).where(
-            self.main_model.organization_id == organization_id,
+            self.main_model.organization_id == org_id,
             self.main_model.user_id == user_id
         )
         res = await self.session.execute(stmt)

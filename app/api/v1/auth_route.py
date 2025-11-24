@@ -1,7 +1,6 @@
 import logging
 from typing import Annotated
 
-
 from fastapi import APIRouter, Depends
 
 from app.dependencies import auth_services
@@ -16,6 +15,7 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
+
 @router.get("/healthcheck", status_code=200)
 async def healthcheck():
     """
@@ -27,14 +27,15 @@ async def healthcheck():
 
 @router.post("/register", status_code=201)
 async def register(
-        register_user: UserRegisterSchemaReq,
+        reg_user_sch: UserRegisterSchemaReq,
         auth_serv: Annotated[AuthService, Depends(auth_services)],
 ):
     """
-    Регистрация пользователя
+    Регистрация пользователя и создание новой организации для него
     """
     logger.info("Try get user service")
-    return await auth_serv.register_user(register_user)
+    return await auth_serv.register_user_with_organisation(reg_user_sch)
+
 
 @router.post("/login", response_model=TokenFullRes)
 async def login(

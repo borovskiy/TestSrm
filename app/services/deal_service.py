@@ -2,12 +2,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.context_user import get_current_user
 from app.models.deal import DealStatus
-from app.models.organization_member import RoleEnum
 from app.repositories.contact_repository import ContactRepository
 from app.repositories.deal_repository import DealRepository
 from app.schemas.deal_schemas import DealCreateSchema, DealCreateSchemaFull, DealPatchSchema
 from app.services.base_services import BaseServices
-from app.utils.raises import _not_found, _forbidden, _bad_request
+from app.utils.raises import _forbidden, _bad_request
 
 
 class DealService(BaseServices):
@@ -18,7 +17,7 @@ class DealService(BaseServices):
 
     async def create_deal(self, data_deal: DealCreateSchema):
         curr_user = get_current_user()
-        org_id = curr_user.organization_id
+        org_id = curr_user.org_id
 
         contact_data = await self.repo_contact.get_check_contact_for_request(id_org=org_id, id_con=data_deal.contact_id, list_valid_roles=self.valid_roles)
         new_deal_data = DealCreateSchemaFull(**data_deal.model_dump())
@@ -30,7 +29,7 @@ class DealService(BaseServices):
 
     async def update_deal(self, deal_id: int, data_deal: DealPatchSchema):
         curr_user = get_current_user()
-        org_id = curr_user.organization_id
+        org_id = curr_user.org_id
         deal = await self.repo_deal.get_check_deal_for_request(deal_id, org_id)
         await self.repo_contact.get_check_contact_for_request(id_org=org_id, id_con=deal.contact_id, list_valid_roles=self.valid_roles)
         if data_deal.status == DealStatus.WON and deal.amount <= 0:

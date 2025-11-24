@@ -46,7 +46,7 @@ def require_roles(
             organization_data = await organization_serv.get_user_organisations(user_id=user_payload.id, ogr_id=x_organization_id)
             if organization_data is None:
                 raise _not_found("Not found user organisation")
-            user_payload.organization_id = x_organization_id
+            user_payload.org_id = x_organization_id
             user_payload.role_in_organization = organization_data.role.value
 
             # Проверяем роли если установлены
