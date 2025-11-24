@@ -6,7 +6,7 @@ from app.services.base_services import BaseServices
 
 class ActivityService(BaseServices):
     def __init__(self, session: AsyncSession):
-        super().__init__()
-        self.repo_user = ActivityRepository(session)
+        super().__init__(session)
+        self.repo_user = ActivityRepository(self.session)
         # self.repo_org = OrganizationRepository(session)
         # self.repo_org_mem = OrganizationMemberRepository(session)

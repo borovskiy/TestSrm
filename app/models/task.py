@@ -12,7 +12,6 @@ from .base import BaseModel
 class TaskModel(BaseModel):
     __tablename__ = "tasks"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     deal_id: Mapped[int] = mapped_column(ForeignKey("deals.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(Text, nullable=True)

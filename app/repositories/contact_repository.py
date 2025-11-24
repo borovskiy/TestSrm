@@ -1,9 +1,10 @@
-from sqlalchemy import select, func, or_, and_
+from sqlalchemy import select, func, or_, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.context_user import get_current_user
 from app.models import ContactModel
 from app.repositories.base_repository import BaseRepo
+from app.schemas.contact_schema import ContactsAddSchema
 from app.schemas.paginate_schema import PaginationGet
 from app.utils.raises import _not_found, _forbidden
 
@@ -13,14 +14,14 @@ class ContactRepository(BaseRepo):
         super().__init__(session)
         self.main_model = ContactModel
 
-    async def get_contacts_organisation(self, id_organisation: int, pag: PaginationGet):
+    async def get_contacts_organisation(self, id_org: int, pag: PaginationGet):
         self.log.info("get_contacts_organisation")
 
-        filters = [self.main_model.organization_id == id_organisation]
+        filters = [self.main_model.organization_id == id_org]
 
         # Фильтр по owner_id
-        if pag.owner_id:
-            filters.append(self.main_model.owner_id == pag.owner_id)
+        if pag.user_id:
+            filters.append(self.main_model.user_id == pag.user_id)
 
         # Поиск по name / email / phone
         if pag.search:
@@ -62,30 +63,48 @@ class ContactRepository(BaseRepo):
         self.log.info(f"add_contacts")
         obj = self.main_model(**data)
         obj.organization_id = id_organisation
-        obj.owner_id = user_id
+        obj.user_id = user_id
         self.session.add(obj)
         await self.session.flush()
         return obj
 
-    async def get_contact_by_org(self, id_org: int, id_con) -> ContactModel:
+    async def get_contact_by_org(self, org_id: int, user_id_cont) -> ContactModel:
         self.log.info(f"get_contact_by_org")
         stmt = (
             select(self.main_model)
             .where(
                 and_(
-                    self.main_model.organization_id == id_org,
-                    self.main_model.id == id_con
+                    self.main_model.organization_id == org_id,
+                    self.main_model.user_id == user_id_cont
                 )
 
             ))
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
-    async def get_check_contact_for_request(self, id_org: int, id_con, list_valid_roles: list) -> ContactModel:
-        contact = await self.get_contact_by_org(id_org, id_con)
-        if contact is None:
-            raise _not_found("Not found contact in organisation")
-        if contact.owner_id != get_current_user().id:
+    async def update_contact(self, id_org: int, id_user, data: ContactsAddSchema):
+        stmt = (
+            update(self.main_model)
+            .where(
+                self.main_model.organization_id == id_org,
+                self.main_model.user_id == id_user,
+            )
+            .values(**data.model_dump())
+            .returning(self.main_model)
+        )
+
+        result = await self.session.execute(stmt)
+        updated_contact = result.scalar_one_or_none()
+
+        await self.session.flush()
+        return updated_contact
+
+
+    async def get_check_contact_for_request(self, id_org: int, id_user, list_valid_roles: list, update: bool = False):
+        if update:
+            contact = await self.get_contact_by_org(id_org, id_user)
+            if contact is None:
+                raise _not_found("Not found contact in organisation")
+        if id_user != get_current_user().id:
             if get_current_user().role_in_organization not in list_valid_roles:
                 raise _forbidden("You do not have the right to change contact data for the current user")
-        return contact

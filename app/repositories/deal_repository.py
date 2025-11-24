@@ -11,7 +11,7 @@ class DealRepository(BaseRepo):
         super().__init__(session)
         self.main_model = DealModel
 
-    async def get_check_deal_for_request(self, deal_id: int, org_id) -> DealModel | None:
+    async def get_deal(self, deal_id: int, org_id) -> DealModel | None:
         self.log.info(f"get_check_deal_for_request")
         stmt = (
             select(self.main_model)
@@ -23,7 +23,21 @@ class DealRepository(BaseRepo):
 
             ))
         res = await self.session.execute(stmt)
-        object_response = res.scalars().first()
-        if object_response is None:
-            raise _forbidden("Not found deal")
-        return object_response
+        return res.scalars().first()
+
+    async def exist_deal_for_user_org(self, user_id: int, deal_id: int, ord_id: int) -> bool:
+        self.log.info(f"exist_deal_user")
+        stmt = (
+            select(self.main_model)
+            .where(
+                and_(
+                    self.main_model.organization_id == ord_id,
+                    self.main_model.id == deal_id,
+                    self.main_model.user_id == user_id
+                )
+
+            ))
+        res = await self.session.execute(stmt)
+        if res.scalars().first() is None:
+            return True
+        return False

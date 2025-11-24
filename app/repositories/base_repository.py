@@ -49,6 +49,7 @@ class BaseRepo(ABC):
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
+
     async def get_list_obj(self):
         self.log.info("get_list_obj")
         stmt_exercise = select(self.main_model)

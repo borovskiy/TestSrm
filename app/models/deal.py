@@ -29,6 +29,8 @@ class DealStatus(PyEnum):
 
     @classmethod
     def rollback_validation(cls, name_status: str, role_request_usr: str, current_status: str) -> bool:
+        # Тут важно все кроме MEMBER могут даунгрейдить статусы
+        # может только перескачить статус вперед
         values = DealStatus.list_values()
 
         if role_request_usr != RoleEnum.MEMBER.value:
@@ -58,16 +60,12 @@ class DealModel(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"))
-    contact_id: Mapped[int] = mapped_column(ForeignKey("contacts.id", ondelete="CASCADE"))
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
     title: Mapped[str] = mapped_column(String(255))
     amount: Mapped[float] = mapped_column(Numeric(15, 2), nullable=True)
     currency: Mapped[str] = mapped_column(String(10), default="USD")
     status: Mapped[DealStatus] = mapped_column(Enum(DealStatus), default=DealStatus.NEW, nullable=False, )
-
     stage: Mapped[DealStage] = mapped_column(Enum(DealStage), default=DealStage.QUALIFICATION, nullable=False, )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     organization: Mapped["OrganizationModel"] = relationship(back_populates="deals")

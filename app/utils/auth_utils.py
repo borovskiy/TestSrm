@@ -102,9 +102,9 @@ class AuthUtils:
             return UserSchemaPayload(**decoded)
 
         except ExpiredSignatureError:
-            raise RuntimeError("Token expired")
+            raise _unauthorized("Token expired")
         except InvalidTokenError as e:
-            raise RuntimeError(f"Invalid token: {e}")
+            raise _unauthorized(f"Invalid token")
 
     @staticmethod
     def refresh_access_token(refresh_token: str):

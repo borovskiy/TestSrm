@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.authentication import require_roles
+from app.context_user import get_current_user
 from app.dependencies import contact_services
 from app.models import ContactModel
 from app.models.organization_member import RoleEnum
@@ -17,7 +18,7 @@ router = APIRouter(
     prefix="/v1/contacts",
     tags=["Contacts"],
 )
-
+## Роут для работы с контактными данными
 
 @router.get("/list",
             response_model=ContactsPage,
@@ -29,21 +30,11 @@ async def get_contacts(
         contact_serv: Annotated[ContactService, Depends(contact_services)],
         pagination: PaginationGet = Depends(PaginationGet),
 ):
-    return await contact_serv.get_contact(pagination)
-
-
-@router.put("/{id_contact}",
-            response_model=ContactsSchema,
-            status_code=200,
-            dependencies=[Depends(require_roles(
-                [RoleEnum.MEMBER.value, RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value, ]))]
-            )
-async def update_contact(
-        id_contact: int,
-        contact_serv: Annotated[ContactService, Depends(contact_services)],
-        contact_data: ContactsAddSchema,
-):
-    return await contact_serv.update_contact(id_contact, contact_data)
+    """
+    Получаем все контакты в текущей организации
+    Так же можно искать контакт по id юзера или по контакным данным
+    """
+    return await contact_serv.get_contacts_org(pagination)
 
 
 @router.post("/",
@@ -56,19 +47,29 @@ async def add_contact(
         contact_serv: Annotated[ContactService, Depends(contact_services)],
         contact_data: ContactsAddSchema,
         user_id: int | None = None,
+
 ):
-    return await contact_serv.add_contact(user_id, contact_data)
+    """
+    Добавляем контакт для юзера в органиации
+    Участник member может добавить только свой контакт в определенной огранизации
+    """
+    return await contact_serv.add_contact(user_id or get_current_user().id, contact_data)
 
 
-@router.delete("/{contact_id}",
-             response_model=ContactsSchema,
-             status_code=200,
-             dependencies=[Depends(require_roles(
-                 [RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value]))]
-             )
-async def delete_contact(
+@router.put("/",
+            response_model=ContactsSchema,
+            status_code=200,
+            dependencies=[Depends(require_roles(
+                [RoleEnum.MEMBER.value, RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value, ]))]
+            )
+async def update_contact(
         contact_serv: Annotated[ContactService, Depends(contact_services)],
         contact_data: ContactsAddSchema,
         user_id: int | None = None,
 ):
-    return await contact_serv.delete_contact(user_id, contact_data)
+    """
+    Обновляем контакт для юзера в органиации
+    Участник member может обновить только свой контакт в определенной огранизации
+    """
+    ##
+    return await contact_serv.update_contact(user_id or get_current_user().id, contact_data)

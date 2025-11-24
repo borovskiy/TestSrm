@@ -25,7 +25,7 @@ class OrganizationRepository(BaseRepo):
         return await self.execute_session_get_one(stmt)
 
     async def get_list_organisation_for_user(self, user_id: int):
-        self.log.info("get_list_obj")
+        self.log.info("get_list_organisation_for_user")
         stmt_exercise = (
 
             select(self.org_mem_model)

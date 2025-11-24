@@ -7,7 +7,7 @@ class UserRegisterSchemaReq(BaseModelSchema):
     email: EmailStr | None = Field(default=None)
     hashed_password: str = Field(..., min_length=8)
     name: str
-    organization_name: str | None
+    organization_name: str | None = None
 
 
 class UserRegisterSchemaCreatedRes(BaseModel):

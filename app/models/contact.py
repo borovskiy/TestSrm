@@ -12,9 +12,9 @@ from .base import BaseModel
 
 class ContactModel(BaseModel):
     __tablename__ = "contacts"
-
+    #Чисто модель контакта юзера в организации. зачем то. Кто нахуй тысячу почт держит в наше время?
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"))
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
     name: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255), nullable=True)
     phone: Mapped[str] = mapped_column(String(50), nullable=True)

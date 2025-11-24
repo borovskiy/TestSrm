@@ -7,7 +7,7 @@ from app.authentication import require_roles
 from app.dependencies import organization_services
 from app.models.organization_member import RoleEnum
 from app.schemas.organisation_schemas import OrganizationCreateSchema, OrganizationGetListSchema, OrganizationGetSchema, \
-    OrganizationAddUserSchema
+    OrganizationAddUserSchema, OrganizationRemoveUserSchema
 from app.services.organisation_service import OrganizationService
 
 logger = logging.getLogger(__name__)
@@ -50,16 +50,27 @@ async def update_name_organization(
 
 
 @router.post("/",
-             response_model=OrganizationGetSchema,
-             status_code=201,
+             status_code=200,
              dependencies=[Depends(require_roles([RoleEnum.ADMIN.value, RoleEnum.OWNER.value]))])
-async def add_member_in_organization(
+async def add_member(
         create_organization: OrganizationAddUserSchema,
         organization_serv: Annotated[OrganizationService, Depends(organization_services)],
 ):
     """
-    Создаем организацию
-    надо подумать кто вобще может их создавать
+    Добавляем участника в организацию
     """
-    logger.info("Try create organisation")
+    logger.info("add_member")
     return await organization_serv.add_member_in_organisation(create_organization)
+
+@router.delete("/",
+             status_code=200,
+             dependencies=[Depends(require_roles([RoleEnum.ADMIN.value, RoleEnum.OWNER.value]))])
+async def remove_member(
+        data: OrganizationRemoveUserSchema,
+        organization_serv: Annotated[OrganizationService, Depends(organization_services)],
+):
+    """
+    Удаление участника из организации
+    """
+    logger.info("remove_member")
+    return await organization_serv.remove_member_from_organisation(data)
