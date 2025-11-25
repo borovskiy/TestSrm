@@ -22,5 +22,5 @@ class UserModel(BaseModel):
     # Relationships
     organization_memberships: Mapped[list["OrganizationMemberModel"]] = relationship(back_populates="user")
     owned_contacts: Mapped[list["ContactModel"]] = relationship(back_populates="owner")
-    owned_deals: Mapped[list["DealModel"]] = relationship(back_populates="owner")
+    user_deals: Mapped[list["DealModel"]] = relationship(back_populates="user")
     activities: Mapped[list["ActivityModel"]] = relationship(back_populates="author")

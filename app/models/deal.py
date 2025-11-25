@@ -1,6 +1,5 @@
 from sqlalchemy import String, DateTime, ForeignKey, Numeric, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime
 from typing import TYPE_CHECKING
 from enum import Enum as PyEnum
 
@@ -8,7 +7,6 @@ from .organization_member import RoleEnum
 
 if TYPE_CHECKING:
     from .organization import OrganizationModel
-    from .contact import ContactModel
     from .user import UserModel
     from .task import TaskModel
     from .activity import ActivityModel
@@ -42,7 +40,6 @@ class DealStatus(PyEnum):
             return False
         return target_index >= current_index
 
-
 class DealStage(PyEnum):
     QUALIFICATION = "qualification"
     PROPOSAL = "proposal"
@@ -54,11 +51,9 @@ class DealStage(PyEnum):
         """Возвращает список значений в порядке объявления"""
         return [member.value for member in cls]
 
-
 class DealModel(BaseModel):
     __tablename__ = "deals"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
     title: Mapped[str] = mapped_column(String(255))
@@ -69,7 +64,6 @@ class DealModel(BaseModel):
 
     # Relationships
     organization: Mapped["OrganizationModel"] = relationship(back_populates="deals")
-    contact: Mapped["ContactModel"] = relationship(back_populates="deals")
-    owner: Mapped["UserModel"] = relationship(back_populates="owned_deals")
+    user: Mapped["UserModel"] = relationship(back_populates="user_deals")
     tasks: Mapped[list["TaskModel"]] = relationship(back_populates="deal")
     activities: Mapped[list["ActivityModel"]] = relationship(back_populates="deal")

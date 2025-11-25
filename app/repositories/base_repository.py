@@ -49,13 +49,11 @@ class BaseRepo(ABC):
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
-
     async def get_list_obj(self):
         self.log.info("get_list_obj")
         stmt_exercise = select(self.main_model)
         res = await self.session.execute(stmt_exercise)
         return res.scalars().all()
-
 
     async def execute_session_get_all(self, stmt):
         try:
@@ -77,15 +75,16 @@ class BaseRepo(ABC):
             self.log.error("Exception %s", ex)
             raise _bad_request("Unexpected error")
 
-    async def execute_session_get_first(self, stmt):
-        try:
-            self.log.info("execute_session_get_first")
-            result = await self.session.execute(stmt)
-            return result.scalars().first()
-        except Exception as ex:
-            self.log.error("error execute stmt %s", stmt)
-            self.log.error("Exception %s", ex)
-            raise _bad_request("Unexpected error")
+    async def delete_by_id(self, obj_id: int) -> bool:
+        # Получаем объект
+        stmt = select(self.main_model).where(self.main_model.id == obj_id)
+        result = await self.session.execute(stmt)
+        obj = result.scalar_one_or_none()
+        # Удаляем
+        await self.session.delete(obj)
+        await self.session.flush()
+
+        return True
 
     async def execute_session_and_commit(self, stmt):
         try:

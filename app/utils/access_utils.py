@@ -14,18 +14,24 @@ class AccessUtils:
         self.org_mem_rep = OrganizationMemberRepository(session)
         self.deal_rep = DealRepository(session)
 
-    async def check_contact_access(self, target_user_id, valid_roles, update):
+
+    async def check_get_list_deal_access(self, target_user_id, valid_roles):
         await self.check_access_role(target_user_id, valid_roles)
         await self.check_access_user_org(target_user_id)
-        await self.check_contact_org(target_user_id, update)
 
     async def check_create_deal_access(self, target_user_id, valid_roles):
         await self.check_access_role(target_user_id, valid_roles)
         await self.check_access_user_org(target_user_id)
 
+    async def check_contact_access(self, target_user_id, valid_roles, update):
+        await self.check_create_deal_access(target_user_id, valid_roles)
+        await self.check_contact_org(target_user_id, update)
+
+    async def check_remove_deal_access(self, target_user_id: int, deal_id: int, valid_roles: list):
+        await self.check_update_deal_access(target_user_id, deal_id, valid_roles)
+
     async def check_update_deal_access(self, target_user_id: int, deal_id: int, valid_roles: list):
-        await self.check_access_role(target_user_id, valid_roles)
-        await self.check_access_user_org(target_user_id)
+        await self.check_create_deal_access(target_user_id, valid_roles)
         await self.check_deal_exist_org(target_user_id, deal_id)
 
     @classmethod

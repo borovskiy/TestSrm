@@ -12,7 +12,7 @@ from .base import BaseModel
 
 class ContactModel(BaseModel):
     __tablename__ = "contacts"
-    #Чисто модель контакта юзера в организации. зачем то. Кто нахуй тысячу почт держит в наше время?
+    # Чисто модель контакта юзера в организации. зачем то. Кто нахуй тысячу почт держит в наше время?
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
     name: Mapped[str] = mapped_column(String(255))
@@ -22,4 +22,3 @@ class ContactModel(BaseModel):
     # Relationships
     organization: Mapped["OrganizationModel"] = relationship(back_populates="contacts")
     owner: Mapped["UserModel"] = relationship(back_populates="owned_contacts")
-    deals: Mapped[list["DealModel"]] = relationship(back_populates="contact")
