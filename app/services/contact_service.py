@@ -35,6 +35,6 @@ class ContactService(BaseServices):
 
     async def update_contact(self, user_id: int, data: ContactsAddSchema) -> ContactModel:
         await self.access_utils.check_contact_access(user_id, self.valid_roles, True)
-        result = await self.cont_org_rep.update_contact(get_current_user().org_id, user_id, data.model_dump())
+        result = await self.cont_org_rep.update_contact(get_current_user().org_id, user_id, data)
         await self.session.commit()
         return result

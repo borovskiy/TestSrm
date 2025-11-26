@@ -33,7 +33,7 @@ class DealService(BaseServices):
         self.access_utils.check_create_deal_access(user_id, self.valid_roles)
         new_deal_data = DealCreateSchemaFull(**data_deal.model_dump())
         new_deal_data.organization_id = get_current_user().org_id
-        # ЗАкрепляем сделку за организацией
+        # Закрепляем сделку за организацией
         result = await self.repo_deal.create_one_obj_model(new_deal_data.model_dump())
         await self.repo_deal.session.commit()
         return result

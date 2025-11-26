@@ -2,7 +2,7 @@ from app.schemas.base_schema import BaseModelSchema
 
 
 class ContactsSchema(BaseModelSchema):
-    owner_id: int
+    user_id: int
     name: str
     email: str
     phone: str

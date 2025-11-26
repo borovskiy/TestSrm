@@ -25,36 +25,34 @@ def get_token(credentials: Optional[HTTPAuthorizationCredentials] = Security(aut
     return credentials.credentials
 
 
-def require_roles(
-        allowed_roles: List[str] = None,
+async def _no_roles_dependency(
+    token: str = Depends(get_token),
 ):
-    async def dependency(
-            organization_serv: Annotated[OrganizationService, Depends(organization_services)],
-            token: str = Depends(get_token),  # твоя функция получения токена
-            x_organization_id: Optional[int] = Header(None, alias="X-Organization-Id"),
+    user_payload = AuthUtils.verify_token(token)
+    set_current_user(user_payload)
 
+
+def _roles_dependency_factory(allowed_roles: List[str]):
+    async def _roles_dependency(
+        organization_serv: Annotated[OrganizationService, Depends(organization_services)],
+        token: str = Depends(get_token),
+        x_organization_id: int = Header(alias="X-Organization-Id"),
     ):
-        # Валидация токен сразу до основной логики
-        user_payload = AuthUtils.verify_token(token)  # твоя функция валидации
-
-        # Если треуются роли значит нужна организация, но если заголовка нет - ошибка
-        if allowed_roles and not None and x_organization_id is None:
-            raise _not_found("X-Organization-Id required")
-
-        # Если все же есть organization_id - получаем данные организации
-        if x_organization_id:
-            organization_data = await organization_serv.get_user_organisations(user_id=user_payload.id, ogr_id=x_organization_id)
-            if organization_data is None:
-                raise _not_found("User not register in organisation")
-            user_payload.org_id = x_organization_id
-            user_payload.role_in_organization = organization_data.role.value
-
-            # Проверяем роли если установлены
-            user_roles = []
-            if user_payload.role_in_organization:
-                user_roles.append(user_payload.role_in_organization)
-
-            if not any(role in allowed_roles for role in user_roles):
-                raise HTTPException(403, "Insufficient permissions")
+        user_payload = AuthUtils.verify_token(token)
+        org_data = await organization_serv.get_user_organisations(
+            user_id=user_payload.id,
+            ogr_id=x_organization_id
+        )
+        if org_data is None:
+            raise _not_found("User not registered in organisation")
+        user_payload.org_id = x_organization_id
+        user_payload.role_in_organization = org_data.role.value
+        if user_payload.role_in_organization not in allowed_roles:
+            raise HTTPException(403, "Insufficient permissions")
         set_current_user(user_payload)
-    return dependency
+    return _roles_dependency
+
+def require_roles(allowed_roles: Optional[List[str]] = None):
+    if allowed_roles:
+        return _roles_dependency_factory(allowed_roles)
+    return _no_roles_dependency

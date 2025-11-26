@@ -7,5 +7,14 @@ alembic revision --autogenerate
 alembic upgrade head
 
 
+SELECT * FROM public.users;
+SELECT * FROM public.tasks;
+SELECT * FROM public.organizations;
+SELECT * FROM public.organization_members;
+SELECT * FROM public.deals;
+SELECT * FROM public.contacts;
+SELECT * FROM public.alembic_version;
+SELECT * FROM public.activities;
+
 docker compose --env-file ./app/.env up -d
 docker compose --env-file ./app/.env down

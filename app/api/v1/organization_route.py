@@ -6,8 +6,9 @@ from fastapi import APIRouter, Depends
 from app.authentication import require_roles
 from app.dependencies import organization_services
 from app.models.organization_member import RoleEnum
-from app.schemas.organisation_schemas import OrganizationCreateSchema, OrganizationGetListSchema, OrganizationGetSchema, \
-    OrganizationAddUserSchema, OrganizationRemoveUserSchema
+from app.schemas.organisation_schemas import OrganizationCreateSchema, OrganizationGetSchema, OrganizationAddUserSchema, \
+    OrganizationRemoveUserSchema
+from app.schemas.paginate_schema import OrganisationPage, PaginationOrgGet
 from app.services.organisation_service import OrganizationService
 
 logger = logging.getLogger(__name__)
@@ -19,18 +20,19 @@ router = APIRouter(
 
 
 @router.get("/me",
-            response_model=List[OrganizationGetListSchema],
+            response_model=OrganisationPage,
             status_code=200,
             dependencies=[Depends(require_roles())]
             )
 async def get_list_organization(
         organization_serv: Annotated[OrganizationService, Depends(organization_services)],
+        pagination: PaginationOrgGet = Depends(PaginationOrgGet),
 ):
     """
     Получаем список организаций у пользователя
     """
     logger.info("Try get list organisation")
-    return await organization_serv.get_list_organisations()
+    return await organization_serv.get_list_organisations(pagination)
 
 
 @router.put("/",
@@ -62,9 +64,10 @@ async def add_member(
     logger.info("add_member")
     return await organization_serv.add_member_in_organisation(create_organization)
 
+
 @router.delete("/",
-             status_code=200,
-             dependencies=[Depends(require_roles([RoleEnum.ADMIN.value, RoleEnum.OWNER.value]))])
+               status_code=200,
+               dependencies=[Depends(require_roles([RoleEnum.ADMIN.value, RoleEnum.OWNER.value]))])
 async def remove_member(
         data: OrganizationRemoveUserSchema,
         organization_serv: Annotated[OrganizationService, Depends(organization_services)],
