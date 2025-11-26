@@ -1,4 +1,4 @@
-from sqlalchemy import String, DateTime, ForeignKey, Numeric, Enum
+from sqlalchemy import String, ForeignKey, Numeric, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING
 from enum import Enum as PyEnum
