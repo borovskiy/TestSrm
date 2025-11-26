@@ -45,7 +45,6 @@ async def get_list_activity(
 
 ):
     """
-    Создаем сделку для пользователя в конкретной огранизации
-    OWNER, MANAGER, ADMIN могут назначить сделку на юзера в организации
+    Порлучаем список активностей для сделки
     """
     return await activ_serv.get_list_activities_deal(deal_id, pag_data)
