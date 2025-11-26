@@ -6,10 +6,9 @@ from fastapi import APIRouter, Depends
 from app.authentication import require_roles
 from app.context_user import get_current_user
 from app.dependencies import contact_services
-from app.models import ContactModel
 from app.models.organization_member import RoleEnum
 from app.schemas.contact_schema import ContactsAddSchema, ContactsSchema
-from app.schemas.paginate_schema import PaginationGet, ContactsPage
+from app.schemas.paginate_schema import ContactsPage, PaginationGetCont
 from app.services.contact_service import ContactService
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,7 @@ router = APIRouter(
             )
 async def get_contacts(
         contact_serv: Annotated[ContactService, Depends(contact_services)],
-        pagination: PaginationGet = Depends(PaginationGet),
+        pagination: PaginationGetCont = Depends(PaginationGetCont),
 ):
     """
     Получаем все контакты в текущей организации

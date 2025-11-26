@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from app.models import OrganizationModel, OrganizationMemberModel
 from app.repositories.base_repository import BaseRepo
-from app.schemas.paginate_schema import PaginationGet, PaginationOrgGet
+from app.schemas.paginate_schema import PaginationOrgGet
 
 
 class OrganizationRepository(BaseRepo):

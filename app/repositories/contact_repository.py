@@ -5,7 +5,7 @@ from app.context_user import get_current_user
 from app.models import ContactModel
 from app.repositories.base_repository import BaseRepo
 from app.schemas.contact_schema import ContactsAddSchema
-from app.schemas.paginate_schema import PaginationGet
+from app.schemas.paginate_schema import PaginationGetCont
 from app.utils.raises import _not_found, _forbidden
 
 
@@ -14,7 +14,7 @@ class ContactRepository(BaseRepo):
         super().__init__(session)
         self.main_model = ContactModel
 
-    async def get_contacts_organisation(self, id_org: int, pag: PaginationGet):
+    async def get_contacts_organisation(self, id_org: int, pag: PaginationGetCont):
         self.log.info("get_contacts_organisation")
 
         filters = [self.main_model.organization_id == id_org]

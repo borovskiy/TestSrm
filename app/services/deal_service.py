@@ -21,7 +21,7 @@ class DealService(BaseServices):
 
     async def list_deals(self, status: List[DealStatus], stage: List[DealStage], filters: DealFilterSchema):
         if filters.user_id is not None:
-            self.access_utils.check_get_list_deal_access(filters.user_id, self.valid_roles)
+            self.access_utils.check_main_access(filters.user_id, self.valid_roles)
         deals, total = await self.repo_deal.list_deal_filtered(get_current_user().org_id, status, stage, filters)
         pages = ceil(total / filters.page_size) if filters.page_size else 1
         result = DealListResponseSchema(deals=deals, total=total, pages=pages,page=filters.page_size, page_size=filters.page_size)
@@ -30,7 +30,7 @@ class DealService(BaseServices):
     async def create_deal(self, user_id: int, data_deal: DealCreateSchema):
         self.log.info(f"create_deal")
         # проверяем доступы для создания сделки
-        self.access_utils.check_create_deal_access(user_id, self.valid_roles)
+        self.access_utils.check_main_access(user_id, self.valid_roles)
         new_deal_data = DealCreateSchemaFull(**data_deal.model_dump())
         new_deal_data.organization_id = get_current_user().org_id
         # Закрепляем сделку за организацией

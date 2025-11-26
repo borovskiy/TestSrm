@@ -21,7 +21,6 @@ async def healthcheck():
     """
     Привычка для для пинга авс
     """
-    print(settings.DATABASE_URL)
     return {"status": "OK"}
 
 

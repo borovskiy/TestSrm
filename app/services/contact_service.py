@@ -7,7 +7,7 @@ from app.models import ContactModel
 from app.repositories.contact_repository import ContactRepository
 from app.repositories.organization_members_repository import OrganizationMemberRepository
 from app.schemas.contact_schema import ContactsAddSchema
-from app.schemas.paginate_schema import PaginationGet, ContactsPage, PageMeta
+from app.schemas.paginate_schema import ContactsPage, PageMeta, PaginationGetCont
 from app.services.base_services import BaseServices
 
 
@@ -17,7 +17,7 @@ class ContactService(BaseServices):
         self.cont_org_rep = ContactRepository(session)
         self.org_mem_rep = OrganizationMemberRepository(session)
 
-    async def get_contacts_org(self, pag: PaginationGet):
+    async def get_contacts_org(self, pag: PaginationGetCont):
         current_user = get_current_user()
         contacts, total = await self.cont_org_rep.get_contacts_organisation(current_user.org_id, pag)
         pages = ceil(total / pag.page_size) if pag.page_size else 1

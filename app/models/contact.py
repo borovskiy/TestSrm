@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .organization import OrganizationModel
     from .user import UserModel
-    from .deal import DealModel
 
 from .base import BaseModel
 

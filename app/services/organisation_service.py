@@ -12,7 +12,7 @@ from app.repositories.organization_repository import OrganizationRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.organisation_schemas import OrganizationCreateSchema, OrganizationAddUserSchema, \
     OrganizationRemoveUserSchema
-from app.schemas.paginate_schema import PaginationGet, OrganisationPage, PageMeta, PaginationOrgGet
+from app.schemas.paginate_schema import OrganisationPage, PageMeta, PaginationOrgGet
 from app.services.base_services import BaseServices
 from app.utils.raises import _not_found, _forbidden, _ok
 
