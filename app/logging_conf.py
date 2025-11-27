@@ -34,7 +34,7 @@ LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "filters": {
-        "correlation": {"()": "logging_conf.CorrelationIdFilter"}
+        "correlation": {"()": "app.logging_conf.CorrelationIdFilter"}
     },
     "formatters": {
         "default": {"format": LOG_FORMAT},

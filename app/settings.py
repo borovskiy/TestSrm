@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     APP_BASE_URL: str
 
     class Config:
-        env_file = ".env"
+        env_file = "app/.env"
         env_file_encoding = "utf-8"
 
     def __init__(self, **kwargs):

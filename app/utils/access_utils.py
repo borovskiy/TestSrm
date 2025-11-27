@@ -4,7 +4,7 @@ from app.context_user import get_current_user
 from app.repositories.contact_repository import ContactRepository
 from app.repositories.deal_repository import DealRepository
 from app.repositories.organization_members_repository import OrganizationMemberRepository
-from app.utils.raises import _forbidden
+from app.utils.raises import _forbidden, _not_found
 
 
 class AccessUtils:
@@ -40,6 +40,12 @@ class AccessUtils:
         if target_user_id != get_current_user().id and get_current_user().role_in_organization not in valid_roles:
             # Проверяем если ид юзера не свой собственный то должны быть права для создания или изменения
             raise _forbidden("You do not have the right to change contact data for the current user")
+
+    async def check_deal_for_org(self, deal_id: int, org_id: int):
+        # Проверяем есть ли сделка на огранизации вобще. Если нет то бросаем оштбку
+        deal = await self.deal_rep.get_deal(deal_id=deal_id, org_id=get_current_user().org_id)
+        if deal is None: raise _not_found("Deal not found")
+        return deal
 
     async def check_access_user_org(self, target_user_id: int):
         if await self.org_mem_rep.get_member_in_organisation(org_id=get_current_user().org_id,

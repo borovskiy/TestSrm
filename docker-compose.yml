@@ -77,6 +77,27 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_service
+    command: >
+      sh -c "
+        alembic -c /app/app/alembic.ini upgrade head &&
+        python3 -m app.main
+      "
+    env_file:
+      - ./app/.env
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5050:5050"
+    networks:
+      - crm_network
 
 volumes:
   postgres_data:
