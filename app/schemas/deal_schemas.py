@@ -1,10 +1,9 @@
 from enum import Enum
-from typing import Optional, List, Annotated, Sequence
+from typing import Optional, Sequence
 
-from fastapi import Query, HTTPException
 from pydantic import create_model, Field, model_validator
 
-from app.context_user import get_current_user
+from app.core.context_user import get_current_user
 from app.models.deal import DealStatus, DealStage
 from app.models.organization_member import RoleEnum
 from app.schemas.base_schema import BaseModelSchema

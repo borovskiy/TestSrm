@@ -1,11 +1,10 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Query
-from pydantic import Field
 
-from app.authentication import require_roles
-from app.context_user import get_current_user
-from app.dependencies import deal_services
+from app.core.authentication import require_roles
+from app.core.context_user import get_current_user
+from app.core.dependencies import deal_services
 from app.models.deal import DealStatus, DealStage
 from app.models.organization_member import RoleEnum
 from app.schemas.deal_schemas import DealCreateSchema, DealGetSchema, DealPatchSchema, DealFilterSchema, \

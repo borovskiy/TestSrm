@@ -2,7 +2,7 @@ from math import ceil
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.context_user import get_current_user
+from app.core.context_user import get_current_user
 from app.repositories.activity_repository import ActivityRepository
 from app.repositories.deal_repository import DealRepository
 from app.schemas.activity_schemas import ActivityCreateSchema

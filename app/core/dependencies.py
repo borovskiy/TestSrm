@@ -8,7 +8,7 @@ from app.services.contact_service import ContactService
 from app.services.deal_service import DealService
 from app.services.organisation_service import OrganizationService
 from app.services.task_service import TaskService
-from app.settings import settings
+from app.core.settings import settings
 
 SessionLocal = async_sessionmaker(
     bind=create_async_engine(settings.DATABASE_URL, echo=False, ),

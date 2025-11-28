@@ -1,10 +1,10 @@
 import logging
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.authentication import require_roles
-from app.dependencies import organization_services
+from app.core.authentication import require_roles
+from app.core.dependencies import organization_services
 from app.models.organization_member import RoleEnum
 from app.schemas.organisation_schemas import OrganizationCreateSchema, OrganizationGetSchema, OrganizationAddUserSchema, \
     OrganizationRemoveUserSchema

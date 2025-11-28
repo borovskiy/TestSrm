@@ -1,7 +1,7 @@
 from contextvars import ContextVar
 from typing import Optional
 
-from app.logging_conf import request_user_var
+from app.core.logging_conf import request_user_var
 from app.schemas.auth_schemas import UserSchemaPayload
 from app.utils.raises import _unauthorized
 

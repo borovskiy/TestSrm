@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.authentication import require_roles
-from app.dependencies import activity_services
+from app.core.authentication import require_roles
+from app.core.dependencies import activity_services
 from app.models.organization_member import RoleEnum
 from app.schemas.activity_schemas import ActivityCreateSchema, ActivityResponseSchema
 from app.schemas.paginate_schema import PaginationGetActivities, ActivitiesPage

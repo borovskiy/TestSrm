@@ -4,8 +4,8 @@ from sqlalchemy.orm import configure_mappers
 from dotenv import load_dotenv
 
 from app.api.v1 import organization_route, auth_route, contact_route, deal_route, task_route, activity_route
-from app.logging_conf import setup_logging
-from app.middleware import CorrelationIdASGIMiddleware
+from app.core.logging_conf import setup_logging
+from app.core.middleware import CorrelationIdASGIMiddleware
 
 setup_logging()
 

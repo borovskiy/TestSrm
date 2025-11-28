@@ -3,16 +3,15 @@ from typing import List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.context_user import get_current_user
+from app.core.context_user import get_current_user
 from app.models.activity import TypeActivity
 from app.models.deal import DealStatus, DealStage
 from app.repositories.activity_repository import ActivityRepository
 from app.repositories.contact_repository import ContactRepository
 from app.repositories.deal_repository import DealRepository
-from app.schemas.activity_schemas import ActivityCreateSchema, UpdateStatusDealPayload
+from app.schemas.activity_schemas import UpdateStatusDealPayload
 from app.schemas.deal_schemas import DealCreateSchema, DealCreateSchemaFull, DealPatchSchema, DealFilterSchema, \
     DealListResponseSchema
-from app.services.activity_service import ActivityService
 from app.services.base_services import BaseServices
 from app.utils.raises import _forbidden
 

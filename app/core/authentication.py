@@ -2,8 +2,8 @@ from typing import List, Optional, Annotated
 from fastapi import Depends, Header, HTTPException, status, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.context_user import set_current_user
-from app.dependencies import organization_services
+from app.core.context_user import set_current_user
+from app.core.dependencies import organization_services
 from app.services.organisation_service import OrganizationService
 from app.utils.auth_utils import AuthUtils
 from app.utils.raises import _not_found

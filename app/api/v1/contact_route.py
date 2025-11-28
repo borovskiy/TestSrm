@@ -3,9 +3,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.authentication import require_roles
-from app.context_user import get_current_user
-from app.dependencies import contact_services
+from app.core.authentication import require_roles
+from app.core.context_user import get_current_user
+from app.core.dependencies import contact_services
 from app.models.organization_member import RoleEnum
 from app.schemas.contact_schema import ContactsAddSchema, ContactsSchema
 from app.schemas.paginate_schema import ContactsPage, PaginationGetCont

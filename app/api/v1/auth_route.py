@@ -3,10 +3,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.dependencies import auth_services
+from app.core.dependencies import auth_services
 from app.schemas.auth_schemas import LoginUserReq, TokenFullRes, UserRegisterSchemaReq, TokenAccessRes
 from app.services.auth_service import AuthService
-from app.settings import settings
 
 logger = logging.getLogger(__name__)
 

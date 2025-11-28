@@ -3,8 +3,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from app.authentication import require_roles
-from app.dependencies import task_services
+from app.core.authentication import require_roles
+from app.core.dependencies import task_services
 from app.models.organization_member import RoleEnum
 from app.schemas.paginate_schema import PaginationTasksGet, PaginationTasksWithDueGet, TasksPage
 from app.schemas.task_schemas import TaskCreateRouteSchema, TaskFullSchema
@@ -45,19 +45,3 @@ async def crate_task_deal(
         deal_id: int
 ):
     return await task_serv.create_tasks(data, deal_id)
-#
-#
-# @router.put("/{id_contact}",
-#             response_model=ContactsSchema,
-#             status_code=200,
-#             dependencies=[Depends(require_roles(
-#                 [RoleEnum.MEMBER.value, RoleEnum.OWNER.value, RoleEnum.MANAGER.value, RoleEnum.ADMIN.value, ]))]
-#             )
-# async def update_contact(
-#         id_contact: int,
-#         contact_serv: Annotated[ContactService, Depends(contact_services)],
-#         contact_data: ContactsAddSchema,
-# ):
-#     ...
-#
-#

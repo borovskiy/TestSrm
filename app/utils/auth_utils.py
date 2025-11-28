@@ -1,12 +1,10 @@
-import os
-
 from jwt import InvalidTokenError, ExpiredSignatureError
 from passlib.context import CryptContext
 import bcrypt
 import jwt
 from datetime import datetime, timedelta, timezone
 from app.schemas.auth_schemas import TokenFullRes, UserSchemaPayload
-from app.settings import settings
+from app.core.settings import settings
 from app.utils.raises import _unauthorized
 
 
