@@ -3,12 +3,14 @@ from math import ceil
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.context_user import get_current_user
+from app.models.activity import TypeActivity
+from app.repositories.activity_repository import ActivityRepository
 from app.repositories.deal_repository import DealRepository
 from app.repositories.tast_repository import TaskRepository
+from app.schemas.activity_schemas import CreateTaskPayload
 from app.schemas.paginate_schema import PaginationTasksWithDueGet, TasksPage, PageMeta
 from app.schemas.task_schemas import TaskCreateRouteSchema, TaskCreateRouteFullSchema
 from app.services.base_services import BaseServices
-from app.utils.raises import _not_found
 
 
 class TaskService(BaseServices):
@@ -16,6 +18,7 @@ class TaskService(BaseServices):
         super().__init__(session)
         self.repo_task = TaskRepository(self.session)
         self.repo_deal = DealRepository(self.session)
+        self.repo_active = ActivityRepository(self.session)
 
     async def create_tasks(self, data: TaskCreateRouteSchema, deal_id: int):
         deal = await self.access_utils.check_deal_for_org(deal_id=deal_id, org_id=get_current_user().org_id)
@@ -24,6 +27,10 @@ class TaskService(BaseServices):
         update_data = TaskCreateRouteFullSchema(**data.model_dump())
         update_data.deal_id = deal_id
         result = await self.repo_task.create_one_obj_model(update_data.model_dump())
+
+        await self.repo_active.create_activity(deal_id, get_current_user().id,
+                                               TypeActivity.TASK_CREATED,
+                                               CreateTaskPayload(task=result.to_dict()).model_dump())
         await self.session.commit()
         return result
 

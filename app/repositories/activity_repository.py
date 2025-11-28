@@ -4,22 +4,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import ActivityModel
 from app.models.activity import TypeActivity
 from app.repositories.base_repository import BaseRepo
-from app.schemas.activity_schemas import CommentPayload
 from app.schemas.paginate_schema import PaginationGetActivities
 
 
-class ActivityRepository(BaseRepo):
+class ActivityRepository(BaseRepo[ActivityModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, ActivityModel)
         self.main_model = ActivityModel
 
     async def create_activity(self, deal_id: int, author_id: int, type_activity: TypeActivity,
-                              payload: CommentPayload) -> ActivityModel:
+                              payload: dict) -> ActivityModel:
         activity = ActivityModel(
             deal_id=deal_id,
             author_id=author_id,
             type=TypeActivity[type_activity],
-            payload=payload.model_dump()
+            payload=payload
         )
 
         self.session.add(activity)

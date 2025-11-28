@@ -1,23 +1,26 @@
 import logging
 from abc import ABC
+from typing import Generic, TypeVar, Type
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
 
+from app.models import BaseModel
 from app.utils.raises import _bad_request
 
+ModelType = TypeVar("ModelType", bound=BaseModel)
 
-class BaseRepo(ABC):
-    def __init__(self, session: AsyncSession):
+class BaseRepo(Generic[ModelType], ABC):
+    def __init__(self, session: AsyncSession, model: Type[ModelType]):
         self.log = logging.LoggerAdapter(
             logging.getLogger(__name__),
             {"component": self.__class__.__name__}
         )
         self.session = session
-        self.main_model = None
+        self.main_model = model
 
-    async def create_one_obj_model(self, data: dict):
+    async def create_one_obj_model(self, data: dict) -> ModelType:
         self.log.info(f"create_one_obj_model")
         model_fields = self.main_model.__table__.columns.keys()
         filtered_data = {k: v for k, v in data.items() if k in model_fields}

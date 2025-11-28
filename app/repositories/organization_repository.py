@@ -7,9 +7,9 @@ from app.repositories.base_repository import BaseRepo
 from app.schemas.paginate_schema import PaginationOrgGet
 
 
-class OrganizationRepository(BaseRepo):
+class OrganizationRepository(BaseRepo[OrganizationModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, OrganizationModel)
         self.main_model = OrganizationModel
         self.org_mem_model = OrganizationMemberModel
 

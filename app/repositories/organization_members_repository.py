@@ -8,9 +8,9 @@ from app.models.organization_member import RoleEnum
 from app.schemas.organisation_schemas import OrgRoleEnum
 
 
-class OrganizationMemberRepository(BaseRepo):
+class OrganizationMemberRepository(BaseRepo[OrganizationMemberModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, OrganizationMemberModel)
         self.main_model = OrganizationMemberModel
 
     async def add_members_in_organisation(self, org_id: int, user_id: int, role: OrgRoleEnum):

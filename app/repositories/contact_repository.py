@@ -9,9 +9,9 @@ from app.schemas.paginate_schema import PaginationGetCont
 from app.utils.raises import _not_found, _forbidden
 
 
-class ContactRepository(BaseRepo):
+class ContactRepository(BaseRepo[ContactModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, ContactModel)
         self.main_model = ContactModel
 
     async def get_contacts_organisation(self, id_org: int, pag: PaginationGetCont):

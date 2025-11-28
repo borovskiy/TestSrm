@@ -11,9 +11,9 @@ from app.repositories.base_repository import BaseRepo
 from app.utils.raises import _not_found
 
 
-class UserRepository(BaseRepo):
+class UserRepository(BaseRepo[UserModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, UserModel)
         self.main_model = UserModel
 
     async def find_user_email(self, mail: EmailStr) -> UserModel | None:

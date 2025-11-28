@@ -6,9 +6,9 @@ from app.repositories.base_repository import BaseRepo
 from app.schemas.paginate_schema import PaginationTasksWithDueGet
 
 
-class TaskRepository(BaseRepo):
+class TaskRepository(BaseRepo[TaskModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, TaskModel)
         self.main_model = TaskModel
 
     async def get_tasks_for_deals(self, pag_data: PaginationTasksWithDueGet):

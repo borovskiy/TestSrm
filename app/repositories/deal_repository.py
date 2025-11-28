@@ -9,9 +9,9 @@ from app.repositories.base_repository import BaseRepo
 from app.schemas.deal_schemas import DealFilterSchema, OrderEnum
 
 
-class DealRepository(BaseRepo):
+class DealRepository(BaseRepo[DealModel]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session)
+        super().__init__(session, DealModel)
         self.main_model = DealModel
 
     async def get_deal(self, deal_id: int, org_id) -> DealModel | None:
